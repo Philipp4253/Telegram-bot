@@ -1,0 +1,15 @@
+# Базовый образ с Python 3.11
+FROM python:3.11-slim
+
+# Рабочая директория внутри контейнера
+WORKDIR /app
+
+# Копируем все файлы проекта в контейнер
+COPY . /app
+
+# Обновляем pip и устанавливаем зависимости из requirements.txt
+RUN pip install --no-cache-dir --upgrade pip
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Запускаем бота
+CMD ["python", "bot.py"]
