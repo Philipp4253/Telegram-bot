@@ -1,0 +1,2 @@
+git rm --cached players.json
+git rm --cached secret.key
