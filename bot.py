@@ -6,7 +6,17 @@ import asyncio
 from telegram import Update, ReplyKeyboardMarkup, KeyboardButton
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, ContextTypes, filters
 
-load_dotenv()  # загружаем переменные из .env
+BOT_TOKEN = os.environ['TELEGRAM_BOT_TOKEN']
+ADMIN_CHAT_ID = os.environ['ADMIN_CHAT_ID']  # если используешь где-то
+
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text("Бот работает!")
+
+app = ApplicationBuilder().token(BOT_TOKEN).build()
+app.add_handler(CommandHandler("start", start))
+
+if __name__ == "__main__":
+    app.run_polling()
 
 # Файл с игроками
 DATA_FILE = "players.json"
@@ -17,8 +27,6 @@ REGISTRATION_OPEN = True
 players = set()
 pending_confirmations = set()
 
-# ID администратора для логов
-ADMIN_CHAT_ID = 5343470709
 
 # ---------------- 📁 Работа с файлом ----------------
 def load_players():
