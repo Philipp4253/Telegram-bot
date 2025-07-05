@@ -1,2 +1,26 @@
-git rm --cached players.json
-git rm --cached secret.key
+# Переменные окружения
+.env
+
+# Кэши Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Виртуальные окружения
+venv/
+env/
+
+# Системные файлы
+.DS_Store
+Thumbs.db
+
+# Docker
+*.log
+*.pid
+
+# IDE и редакторы
+.vscode/
+.idea/
+*.swp
+*.swo
