@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  telegram-bot:
+    image: telegram-volleyball-bot:latest  # или имя образа на Docker Hub, если пушишь туда
+    container_name: telegram-bot
+    restart: unless-stopped
+    environment:
+      TELEGRAM_BOT_TOKEN: "your_token_here"
+      ADMIN_CHAT_ID: "your_chat_id_here"
+    # если нужен .env, можно подключить так:
+    # env_file:
+    #   - .env
+    volumes:
+      - ./logs:/app/logs  # если бот пишет логи в папку logs
+    networks:
+      - bot-network
+
+networks:
+  bot-network:
+    driver: bridge
