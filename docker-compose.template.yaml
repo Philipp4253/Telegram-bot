@@ -1,4 +1,4 @@
-version: '3.8'
+ version: '3.8'
 
 services:
   telegram-bot:
@@ -7,8 +7,7 @@ services:
     restart: unless-stopped
     environment:
       TELEGRAM_BOT_TOKEN: "8100778277:AAFdh8ZubXRN41ZR-HABXxSttckPNT54grU"
-      ADMIN_CHAT_ID: "@VolleyUsmBot"
-    # Если бот пишет логи в файл, можно подключить том:
+      ADMIN_CHAT_ID: "5343470709"
     volumes:
       - ./logs:/app/logs
     networks:
