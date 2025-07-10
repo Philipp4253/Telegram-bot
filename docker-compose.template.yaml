@@ -1,18 +1,14 @@
- version: '3.8'
+version: '3.8'
 
 services:
-  telegram-bot:
-    image: telegram-volleyball-bot:latest
-    container_name: telegram-volleyball-bot
+  telegram_volleyball_bot:
+    image: philippkrytoi/telegram-volleyball-bot:${VERSION}
     restart: unless-stopped
     environment:
-      TELEGRAM_BOT_TOKEN: "8100778277:AAFdh8ZubXRN41ZR-HABXxSttckPNT54grU"
-      ADMIN_CHAT_ID: "5343470709"
-    volumes:
-      - ./logs:/app/logs
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
+      ADMIN_CHAT_ID: ${ADMIN_CHAT_ID}
     networks:
-      - bot-network
+      - telegram_volleyball_bot_network
 
 networks:
-  bot-network:
-    driver: bridge
+  telegram_volleyball_bot_network:
