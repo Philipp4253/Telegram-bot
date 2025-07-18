@@ -5,8 +5,17 @@ import asyncio
 from telegram import Update, ReplyKeyboardMarkup, KeyboardButton
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, ContextTypes, filters
 
-BOT_TOKEN = os.environ['TELEGRAM_BOT_TOKEN']
-ADMIN_CHAT_ID = os.environ['ADMIN_CHAT_ID']  
+BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+if not BOT_TOKEN:
+    raise ValueError(
+        "DISCORD_TOKEN not found in environment variables. Please set it."
+    )
+
+ADMIN_CHAT_ID = os.getenv("ADMIN_CHAT_ID")
+if not ADMIN_CHAT_ID:
+    raise ValueError(
+        "ADMIN_CHAT_ID not found in environment variables. Please set it."
+    )
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("Бот работает!")
@@ -174,11 +183,7 @@ async def reminder_job(app):
 async def main():
     load_players()
 
-    token = os.getenv("TELEGRAM_BOT_TOKEN")
-    if not token:
-        raise Exception("⛔️ TELEGRAM_BOT_TOKEN не найден в переменных окружения.")
-
-    app = ApplicationBuilder().token(token).build()
+    app = ApplicationBuilder().token(BOT_TOKEN).build()
     app.add_handler(CommandHandler("start", start))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
     app.create_task(reminder_job(app))
