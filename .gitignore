@@ -1,5 +1,6 @@
 # Переменные окружения
 .env
+players.json
 
 # Кэши Python
 __pycache__/
@@ -24,7 +25,3 @@ Thumbs.db
 .idea/
 *.swp
 *.swo
-# Игнорировать файл с переменными окружения и локальные данные игроков
-.env
-players.json
-.env
