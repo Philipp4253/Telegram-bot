@@ -65,10 +65,3 @@ jobs:
 
       - name: Build docker image
         run: docker build -t telegram-volleyball-bot:latest .
-
-      - name: Scan for vulnerabilities (optional)
-        if: always()
-        uses: docker/scout-action@v1
-        with:
-          image: telegram-volleyball-bot:latest
-          only-severities: critical,high
