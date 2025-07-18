@@ -8,8 +8,13 @@ services:
     environment:
       TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
       ADMIN_CHAT_ID: ${ADMIN_CHAT_ID}
+    volumes:
+      - ./data:/app
     networks:
       - telegram_volleyball_bot_network
+
+volumes:
+  data:
 
 networks:
   telegram_volleyball_bot_network:
