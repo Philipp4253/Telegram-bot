@@ -3,6 +3,7 @@ version: '3.8'
 services:
   telegram_volleyball_bot:
     image: philippkrytoi/telegram-volleyball-bot:${VERSION}
+    pull_policy: if_not_present
     restart: unless-stopped
     environment:
       TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
