@@ -14,7 +14,7 @@ if not ADMIN_CHAT_ID:
     raise ValueError("ADMIN_CHAT_ID not found in environment variables. Please set it.")
 
 # Файл с игроками
-DATA_FILE = "players.json"
+DATA_FILE = "/app/data/players.json"
 # День игры
 GAME_DAY = "воскресенье"
 REGISTRATION_OPEN = True
