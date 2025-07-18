@@ -63,10 +63,12 @@ jobs:
 
       - name: Forming docker-compose file
         env:
-          TELEGRAM_BOT_TOKEN: ${{ vars.TELEGRAM_BOT_TOKEN }}
-          ADMIN_CHAT_ID: ${{ vars.ADMIN_CHAT_ID }}
+          DOCKER_REPO: ${{ secrets.DOCKER_REPO }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          ADMIN_CHAT_ID: ${{ secrets.ADMIN_CHAT_ID }}
         run: |
           sed -e "s/\${VERSION}/$SHORT_SHA/g" \
+              -e "s/\${DOCKER_REPO}/$DOCKER_REPO/g" \
               -e "s/\${TELEGRAM_BOT_TOKEN}/$TELEGRAM_BOT_TOKEN/g" \
               -e "s/\${ADMIN_CHAT_ID}/$ADMIN_CHAT_ID/g" \
               docker-compose.template.yaml > docker-compose.yaml
@@ -100,4 +102,6 @@ jobs:
             export TELEGRAM_BOT_TOKEN="${{ secrets.TELEGRAM_BOT_TOKEN }}"
             docker-compose down
             docker-compose up -d
+            docker system prune -f
+            docker image prune -a -f
           EOF
