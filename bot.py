@@ -5,27 +5,21 @@ import asyncio
 from telegram import Update, ReplyKeyboardMarkup, KeyboardButton
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, ContextTypes, filters
 
-BOT_TOKEN = os.environ['TELEGRAM_BOT_TOKEN']
-ADMIN_CHAT_ID = os.environ['ADMIN_CHAT_ID']  
+BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+if not BOT_TOKEN:
+    raise ValueError("TELEGRAM_BOT_TOKEN not found in environment variables. Please set it.")
 
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("Бот работает!")
-
-app = ApplicationBuilder().token(BOT_TOKEN).build()
-app.add_handler(CommandHandler("start", start))
-
-if __name__ == "__main__":
-    app.run_polling()
+ADMIN_CHAT_ID = os.getenv("ADMIN_CHAT_ID")
+if not ADMIN_CHAT_ID:
+    raise ValueError("ADMIN_CHAT_ID not found in environment variables. Please set it.")
 
 # Файл с игроками
-DATA_FILE = "players.json"
-
+DATA_FILE = "/app/data/players.json"
 # День игры
 GAME_DAY = "воскресенье"
 REGISTRATION_OPEN = True
 players = set()
 pending_confirmations = set()
-
 
 # ---------------- 📁 Работа с файлом ----------------
 def load_players():
@@ -38,11 +32,9 @@ def load_players():
     except FileNotFoundError:
         players = set()
 
-
 def save_players():
     with open(DATA_FILE, "w", encoding="utf-8") as f:
         json.dump(list(players), f)
-
 
 # ---------------- 🤖 Команды бота ----------------
 main_keyboard = ReplyKeyboardMarkup(
@@ -53,13 +45,11 @@ main_keyboard = ReplyKeyboardMarkup(
     resize_keyboard=True
 )
 
-
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
         f"Привет, {update.effective_user.first_name}! Добро пожаловать в волейбольный бот 🏐",
         reply_markup=main_keyboard
     )
-
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     global REGISTRATION_OPEN
@@ -137,7 +127,6 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     else:
         await update.message.reply_text("Пожалуйста, выберите действие с клавиатуры.")
 
-
 # ---------------- ⏰ Планировщик ----------------
 async def reminder_job(app):
     global REGISTRATION_OPEN
@@ -169,16 +158,11 @@ async def reminder_job(app):
 
         await asyncio.sleep(30)
 
-
 # ---------------- 🔧 Запуск ----------------
 async def main():
     load_players()
 
-    token = os.getenv("TELEGRAM_BOT_TOKEN")
-    if not token:
-        raise Exception("⛔️ TELEGRAM_BOT_TOKEN не найден в переменных окружения.")
-
-    app = ApplicationBuilder().token(token).build()
+    app = ApplicationBuilder().token(BOT_TOKEN).build()
     app.add_handler(CommandHandler("start", start))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
     app.create_task(reminder_job(app))
@@ -186,8 +170,7 @@ async def main():
     print("🤖 Бот запущен!")
     await app.run_polling()
 
-
 if __name__ == "__main__":
     import nest_asyncio
     nest_asyncio.apply()
-    asyncio.get_event_loop().run_until_complete(main())
+    asyncio.run(main())
