@@ -1,0 +1,61 @@
+name: Deploy for test
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  build_deploy_test:
+    name: Build and deploy on test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Get short SHA
+        id: get-short-sha
+        run: echo "SHORT_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+
+      - name: Forming docker-compose file
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ vars.TELEGRAM_BOT_TOKEN }}
+          ADMIN_CHAT_ID: ${{ vars.ADMIN_CHAT_ID }}
+        run: |
+          sed -e "s/\${VERSION}/$SHORT_SHA/g" \
+              -e "s/\${TELEGRAM_BOT_TOKEN}/$TELEGRAM_BOT_TOKEN/g" \
+              -e "s/\${ADMIN_CHAT_ID}/$ADMIN_CHAT_ID/g" \
+              docker-compose.template.yaml > docker-compose.yaml
+      
+      - name: Log in to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push telegram-volleyball-bot image
+        working-directory: ./
+        run: |
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/telegram-volleyball-bot:$SHORT_SHA .
+          docker push ${{ secrets.DOCKER_USERNAME }}/telegram-volleyball-bot:$SHORT_SHA
+
+      - name: Set up SSH key
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+      
+      - name: Copy docker-compose.yaml to server
+        run: |
+          scp -o StrictHostKeyChecking=no -P ${{ secrets.SSH_PORT }} ./docker-compose.yaml ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:/srv/telegram-volleyball-bot
+
+      - name: SSH to server and deploy
+        run: |
+          ssh -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} << EOF
+            cd /srv/telegram-volleyball-bot
+            docker pull ${{ secrets.DOCKER_USERNAME }}/telegram-volleyball-bot:$SHORT_SHA
+            export TELEGRAM_BOT_TOKEN="${{ secrets.TELEGRAM_BOT_TOKEN }}"
+            docker-compose down
+            docker-compose up -d
+            docker system prune -f
+            docker image prune -a -f
+          EOF
