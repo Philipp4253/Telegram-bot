@@ -100,6 +100,4 @@ jobs:
             export TELEGRAM_BOT_TOKEN="${{ secrets.TELEGRAM_BOT_TOKEN }}"
             docker-compose down
             docker-compose up -d
-            docker system prune -f
-            docker image prune -a -f
           EOF
