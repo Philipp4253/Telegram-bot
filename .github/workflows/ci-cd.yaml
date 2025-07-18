@@ -80,8 +80,8 @@ jobs:
       - name: Build and push telegram-volleyball-bot image
         working-directory: ./
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/telegram-volleyball-bot:$SHORT_SHA .
-          docker push ${{ secrets.DOCKER_USERNAME }}/telegram-volleyball-bot:$SHORT_SHA
+          docker build -t ${{ secrets.DOCKER_REPO }}/telegram-volleyball-bot:$SHORT_SHA .
+          docker push ${{ secrets.DOCKER_REPO }}/telegram-volleyball-bot:$SHORT_SHA
 
       - name: Set up SSH key
         uses: webfactory/ssh-agent@v0.5.3
@@ -96,7 +96,7 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} << EOF
             cd /srv/telegram-volleyball-bot
-            docker pull ${{ secrets.DOCKER_USERNAME }}/telegram-volleyball-bot:$SHORT_SHA
+            docker pull ${{ secrets.DOCKER_REPO }}/telegram-volleyball-bot:$SHORT_SHA
             export TELEGRAM_BOT_TOKEN="${{ secrets.TELEGRAM_BOT_TOKEN }}"
             docker-compose down
             docker-compose up -d
